@@ -127,11 +127,11 @@ function M.select(config, acts)
               buffers[entry.index] = bufnr
               do_preview = true
 
-              vim.api.nvim_win_set_option(preview_winid, "winhl", "Normal:TelescopePreviewNormal")
-              vim.api.nvim_win_set_option(preview_winid, "signcolumn", "no")
-              vim.api.nvim_win_set_option(preview_winid, "foldlevel", 100)
-              vim.api.nvim_win_set_option(preview_winid, "wrap", false)
-              vim.api.nvim_win_set_option(preview_winid, "scrollbind", false)
+              vim.api.nvim_set_option_value("winhl", "Normal:TelescopePreviewNormal", { win = preview_winid })
+              vim.api.nvim_set_option_value("signcolumn", "no", { win = preview_winid })
+              vim.api.nvim_set_option_value("foldlevel", 100, { win = preview_winid })
+              vim.api.nvim_set_option_value("wrap", false, { win = preview_winid })
+              vim.api.nvim_set_option_value("scrollbind", false, { win = preview_winid })
             end
 
             utils.win_set_buf_noautocmd(preview_winid, bufnr)

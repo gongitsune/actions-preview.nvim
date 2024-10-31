@@ -116,7 +116,8 @@ function M.code_actions(opts)
   end
   if not context.diagnostics then
     local bufnr = vim.api.nvim_get_current_buf()
-    context.diagnostics = vim.diagnostic.get(bufnr)
+    local line = vim.api.nvim_win_get_cursor(0)[1] - 1
+    context.diagnostics = vim.diagnostic.get(bufnr, { lnum = line })
   end
   local mode = vim.api.nvim_get_mode().mode
   local bufnr = vim.api.nvim_get_current_buf()

@@ -90,9 +90,9 @@ function M.select(config, actions)
               if preview.syntax ~= "" then
                 vim.treesitter.start(cache.bufnr, preview.syntax)
               else
-                vim.api.nvim_buf_set_option(cache.bufnr, "syntax", preview.syntax)
+                vim.api.nvim_set_option_value("syntax", preview.syntax, { buf = cache.bufnr })
               end
-              vim.api.nvim_buf_set_option(cache.bufnr, "modifiable", false)
+              vim.api.nvim_set_option_value("modifiable", false, { buf = cache.bufnr })
             end
           end)
         end
