@@ -41,6 +41,58 @@ local function range_from_selection(bufnr, mode)
   }
 end
 
+---@return lsp.DiagnosticSeverity
+local function severity_vim_to_lsp(severity)
+  if type(severity) == 'string' then
+    severity = vim.diagnostic.severity[severity]
+  end
+  return severity
+end
+
+--- @param diagnostic vim.Diagnostic
+--- @return lsp.DiagnosticTag[]?
+local function tags_vim_to_lsp(diagnostic)
+  if not diagnostic._tags then
+    return
+  end
+
+  local tags = {} --- @type lsp.DiagnosticTag[]
+  if diagnostic._tags.unnecessary then
+    tags[#tags + 1] = vim.lsp.protocol.DiagnosticTag.Unnecessary
+  end
+  if diagnostic._tags.deprecated then
+    tags[#tags + 1] = vim.lsp.protocol.DiagnosticTag.Deprecated
+  end
+  return tags
+end
+
+--- @param diagnostics vim.Diagnostic[]
+--- @return lsp.Diagnostic[]
+local function diagnostic_vim_to_lsp(diagnostics)
+  ---@param diagnostic vim.Diagnostic
+  ---@return lsp.Diagnostic
+  return vim.tbl_map(function(diagnostic)
+    return vim.tbl_extend('keep', {
+      -- "keep" the below fields over any duplicate fields in diagnostic.user_data.lsp
+      range = {
+        start = {
+          line = diagnostic.lnum,
+          character = diagnostic.col,
+        },
+        ['end'] = {
+          line = diagnostic.end_lnum,
+          character = diagnostic.end_col,
+        },
+      },
+      severity = severity_vim_to_lsp(diagnostic.severity),
+      message = diagnostic.message,
+      source = diagnostic.source,
+      code = diagnostic.code,
+      tags = tags_vim_to_lsp(diagnostic),
+    }, diagnostic.user_data and (diagnostic.user_data.lsp or {}) or {})
+  end, diagnostics)
+end
+
 local function on_code_action_results(results, opts)
   -- based on https://github.com/neovim/neovim/blob/v0.10.0/runtime/lua/vim/lsp/buf.lua#L705-L731
   local function action_filter(a)
@@ -117,7 +169,7 @@ function M.code_actions(opts)
   if not context.diagnostics then
     local bufnr = vim.api.nvim_get_current_buf()
     local line = vim.api.nvim_win_get_cursor(0)[1] - 1
-    context.diagnostics = vim.diagnostic.get(bufnr, { lnum = line })
+    context.diagnostics = diagnostic_vim_to_lsp(vim.diagnostic.get(bufnr, { lnum = line }))
   end
   local mode = vim.api.nvim_get_mode().mode
   local bufnr = vim.api.nvim_get_current_buf()
