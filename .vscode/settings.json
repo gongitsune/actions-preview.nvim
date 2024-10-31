@@ -1,0 +1,12 @@
+{
+    "Lua.runtime.version": "LuaJIT",
+    "Lua.runtime.path": [
+        "?.lua",
+        "?/init.lua",
+        "/usr/share/nvim/runtime/lua/vim",
+        "/usr/share/nvim/runtime/lua/vim/?.lua",
+    ],
+    "Lua.workspace.library": [
+        "/usr/share/nvim/runtime/lua",
+    ],
+}

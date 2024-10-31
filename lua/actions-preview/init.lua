@@ -21,13 +21,13 @@ local function lsp_get_clients(filter)
     bufnr = vim.api.nvim_get_current_buf()
   end
 
-  for _, client in ipairs(vim.lsp.get_active_clients()) do
+  for _, client in ipairs(vim.lsp.get_clients()) do
     if
-      true
-      and (filter.id == nil or client.id == filter.id)
-      and (filter.bufnr == nil or client.attached_buffers[bufnr])
-      and (filter.name == nil or client.name == filter.name)
-      and (filter.method == nil or client.supports_method(filter.method))
+        true
+        and (filter.id == nil or client.id == filter.id)
+        and (filter.bufnr == nil or client.attached_buffers[bufnr])
+        and (filter.name == nil or client.name == filter.name)
+        and (filter.method == nil or client.supports_method(filter.method))
     then
       clients[#clients + 1] = client
     end
@@ -148,7 +148,7 @@ function M.code_actions(opts)
   end
   if not context.diagnostics then
     local bufnr = vim.api.nvim_get_current_buf()
-    context.diagnostics = vim.lsp.diagnostic.get_line_diagnostics(bufnr)
+    context.diagnostics = vim.diagnostic.get(bufnr)
   end
   local mode = vim.api.nvim_get_mode().mode
   local bufnr = vim.api.nvim_get_current_buf()
@@ -187,7 +187,7 @@ function M.code_actions(opts)
     elseif mode == "v" or mode == "V" then
       local range = range_from_selection(bufnr, mode)
       params =
-        vim.lsp.util.make_given_range_params(range.start, range["end"], bufnr, client.offset_encoding)
+          vim.lsp.util.make_given_range_params(range.start, range["end"], bufnr, client.offset_encoding)
     else
       params = vim.lsp.util.make_range_params(win, client.offset_encoding)
     end
